@@ -16,6 +16,14 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const savedTransactions = localStorage.getItem('transactions');
