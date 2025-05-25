@@ -8,6 +8,7 @@ export interface Transaction {
   type: TransactionType;
   date: string;
   imageUrl?: string;
+  sharedAt?: string;
 }
 
 export interface Category {

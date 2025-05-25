@@ -2,20 +2,35 @@ import React from 'react';
 import { Transaction } from '../../types';
 import { useAppContext } from '../../context/AppContext';
 import { formatCurrency } from '../../utils/helpers';
-import { ArrowDownCircle, ArrowUpCircle, Trash2 } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, Trash2, Share2 } from 'lucide-react';
 
 interface TransactionItemProps {
   transaction: Transaction;
 }
 
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction }) => {
-  const { categories, deleteTransaction } = useAppContext();
+  const { categories, deleteTransaction, updateTransaction } = useAppContext();
   
   const category = categories.find(cat => cat.id === transaction.category || cat.name === transaction.category);
   
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this transaction?')) {
       deleteTransaction(transaction.id);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'TrackFlow Transaction',
+      text: `${transaction.description}: ${formatCurrency(transaction.amount)}`,
+      url: `${window.location.origin}?t=${transaction.id}`
+    };
+
+    try {
+      await navigator.share(shareData);
+      updateTransaction(transaction.id, { ...transaction, sharedAt: new Date().toISOString() });
+    } catch (err) {
+      console.error('Error sharing:', err);
     }
   };
 
@@ -44,6 +59,12 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction }) => {
               <span className="text-xs text-gray-500 ml-2">
                 {new Date(transaction.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
+              {transaction.sharedAt && (
+                <span className="text-xs text-teal-600 ml-2 flex items-center">
+                  <Share2 className="w-3 h-3 mr-1" />
+                  Shared {new Date(transaction.sharedAt).toLocaleDateString()}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -52,9 +73,15 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction }) => {
           <span className={`font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
             {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
           </span>
+          <button
+            onClick={handleShare}
+            className="ml-3 text-gray-400 hover:text-teal-600 transition-colors"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
           <button 
             onClick={handleDelete}
-            className="ml-4 text-gray-400 hover:text-red-500 transition-colors"
+            className="ml-3 text-gray-400 hover:text-red-500 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
