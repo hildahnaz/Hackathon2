@@ -2,7 +2,7 @@
 
 A modern, user-friendly application for small business owners to track their income and expenses with voice and photo input capabilities for real-time financial monitoring.
 
-[View Live Demo](https://trackflow-business.netlify.app)
+[View Live Demo](https://trackflow-demo.netlify.app)
 
 ## Features
 
