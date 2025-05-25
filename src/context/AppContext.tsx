@@ -8,6 +8,7 @@ interface AppContextType {
   categories: Category[];
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
   deleteTransaction: (id: string) => void;
+  updateTransaction: (id: string, transaction: Transaction) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
   deleteCategory: (id: string) => void;
   calculateBalance: () => { income: number; expense: number; profit: number };
@@ -47,6 +48,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTransactions((prev) => prev.filter((transaction) => transaction.id !== id));
   };
 
+  const updateTransaction = (id: string, transaction: Transaction) => {
+    setTransactions((prev) => 
+      prev.map((t) => t.id === id ? transaction : t)
+    );
+  };
+
   const addCategory = (category: Omit<Category, 'id'>) => {
     const newCategory = {
       ...category,
@@ -80,6 +87,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         categories,
         addTransaction,
         deleteTransaction,
+        updateTransaction,
         addCategory,
         deleteCategory,
         calculateBalance,
@@ -88,12 +96,4 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       {children}
     </AppContext.Provider>
   );
-};
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppProvider');
-  }
-  return context;
 };
